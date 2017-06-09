@@ -1,6 +1,7 @@
 $(function() {
     var posts = {};
     var postData = {};
+    const {clipboard} = require('electron');
     $.get("https://a.4cdn.org/pol/catalog.json", function(catalog) {
         catalog.forEach((page) => {
             page.threads.forEach((thread) => {
@@ -30,7 +31,7 @@ $(function() {
 
     $(document).ajaxStop(function() {
         var sorted = sortObject(posts);
-        for(var i = 0; i < 300; i ++)
+        for(var i = 0; i < 200; i ++)
             renderPost(postData[sorted[i].key], sorted[i].value);
     });
 
@@ -64,8 +65,10 @@ $(function() {
                 }
                 var postMsg = $("<blockquote>").attr("class", "postMessage").html(com ? com : "");
 
+        var fullUrl = "https://boards.4chan.org/pol/thread/" + thread + "#p" + no;
         viewPost.css("cursor", "pointer");
-        viewPost.click(() => require("electron").shell.openExternal("https://boards.4chan.org/pol/thread/" + thread + "/#p" + no));
+        viewPost.contextmenu(() => clipboard.writeText(fullUrl));
+        viewPost.click(() => require("electron").shell.openExternal(fullUrl));
 
         nameBlock.append(nameSpan).append(flag);
         if(filename)
@@ -106,3 +109,4 @@ $(function() {
         return arr;
     }
 });
+
